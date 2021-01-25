@@ -1,0 +1,33 @@
+@import '../../assets/scss/global.scss';
+
+.welcome-main-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  h3 {
+    max-width: 40ch;
+    margin-bottom: 10px;
+  }
+  .welcome-img {
+    img {
+      width: 100px;
+      border: 1px solid rgba(128, 128, 128, 0.349);
+      border-radius: 50%;
+      background-color: #fff;
+      padding: 10px;
+    }
+  }
+  button {
+    background-color: $clr1;
+    border: none;
+    box-shadow: 0px 10px 40px -10px rgba(255, 0, 131, 0.5);
+    &:focus {
+      background-color: rgb(192, 4, 101);
+    }
+    &:hover {
+      background-color: rgb(255, 97, 179);
+    }
+  }
+}

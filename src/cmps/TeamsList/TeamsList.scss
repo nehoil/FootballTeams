@@ -1,0 +1,28 @@
+// @import '../../../assets/scss/global.scss';
+.teamslist-container {
+  width: 100%;
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  img {
+    width: 80px;
+  }
+  .ant-input-group-wrapper {
+    max-width: 250px;
+    margin: 20px;
+  }
+
+  .ant-table-content{
+     width: 100%;
+  }
+  .ant-table-cell {
+    @media (max-width: 476px) {
+      img {
+        width: 20px;
+      }
+    }
+  }
+}
