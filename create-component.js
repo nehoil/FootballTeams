@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-// node create-component.js --name "Home" --dir "./pages/"
+// node create-component.js --name "FavoriteTeams" --dir "./cmps/"
 
 const validOptions = {
     name: 'name',

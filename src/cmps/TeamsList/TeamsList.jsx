@@ -1,84 +1,103 @@
 import './TeamsList.scss';
-import { Input, Space } from 'antd';
-import { Table, Button } from 'antd';
+import { Input } from 'antd';
+import { Table } from 'antd';
 import react from 'react';
-const columns = [
-  {
-    title: 'Name',
-    dataIndex: 'shortName',
-    sorter: {
-      compare: (a, b) => a.shortName > b.shortName,
-    },
-  },
-  {
-    title: 'Founded',
-    dataIndex: 'founded',
-    sorter: {
-      compare: (a, b) => a.founded - b.founded,
-      multiple: 2,
-    },
-  },
-  {
-    title: 'Crest',
-    dataIndex: 'crestUrl',
-    render: (text, row, idx) => {
-      return <img src={text} alt="" key={idx} />;
-    },
-  },
-];
+import { connect } from 'react-redux';
+import {
+  updateSelected,
+  removeSelected,
+  addSelected,
+} from '../../store/actions/teamsAction';
+
 const { Search } = Input;
 
-export default class TeamList extends react.Component {
+class _TeamList extends react.Component {
   state = {
-    selectedRowKeys: [],
-    loading: false,
-    teams: [],
+    term: '',
+    isMobile: false,
+    show: false,
   };
+  columns = [
+    {
+      title: 'Name',
+      dataIndex: 'shortName',
+      sorter: {
+        compare: (a, b) => a.shortName > b.shortName,
+      },
+      width: this.colWidth,
+    },
+    {
+      title: 'Founded',
+      dataIndex: 'founded',
+      sorter: {
+        compare: (a, b) => a.founded - b.founded,
+        multiple: 2,
+      },
+      width: this.colWidth,
+    },
+    {
+      title: 'Crest',
+      dataIndex: 'crestUrl',
+      render: (text, row, idx) => {
+        return <img src={text} alt="" key={idx} />;
+      },
+      width: this.colWidth,
+    },
+  ];
 
   componentDidMount() {
-    const teams = this.props.data.teams.reduce((acc, team, idx) => {
-      team.key = idx;
-      acc.push(team);
-      return acc;
-    }, []);
-    this.setState({ teams, selectedRowKeys: this.props.data.selected });
+    window.addEventListener('resize', this.resize.bind(this));
+    this.resize();
+      this.setState({ show: true });
   }
-  componentDidUpdate(){
-    this.props.selectedChange(this.state.selectedRowKeys)
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize.bind(this));
+  }
+
+  get mainClass() {
+    const regularClass = 'teamslist-container container';
+    return this.state.show ? regularClass + ' show' : regularClass;
+  }
+  get colWidth() {
+    return this.state.isMobile ? 0 : 150;
+  }
+  get teamsDate() {
+    const { term } = this.state;
+    if (term) {
+      return this.props.data.teams.filter(
+        (team) =>
+          team.shortName.toLowerCase().includes(term.toLowerCase()) ||
+          team.founded === term
+      );
+    }
+    return this.props.data.teams;
+  }
+
+  resize() {
+    this.setState({ isMobile: window.innerWidth <= 600 });
   }
   onSearch = (term) => {
-    const filteredTeams = this.props.data.teams.filter(team=> team.shortName.includes(term) || team.founded === term)
-    this.setState({teams: filteredTeams})
+    this.setState({ term });
   };
   onSelectChange = (selectedRowKeys) => {
-    this.setState({ selectedRowKeys });
+    this.props.updateSelected(selectedRowKeys);
   };
-
   onRowClicked(idx) {
-    if (!this.state.selectedRowKeys.includes(idx)) {
-      this.setState((prevState) => {
-        return {
-          ...prevState,
-          selectedRowKeys: [...prevState.selectedRowKeys, idx],
-        };
-      });
+    if (!this.props.data.selected.includes(idx)) {
+      this.props.addSelected(idx);
     } else {
-      const filteredData = this.state.selectedRowKeys.filter(
-        (team) => team !== idx
-      );
-      this.setState({ selectedRowKeys: filteredData });
+      this.props.removeSelected(idx);
     }
   }
 
   render() {
-    const { loading, selectedRowKeys } = this.state;
     const rowSelection = {
-      selectedRowKeys,
+      selectedRowKeys: this.props.data.selected,
       onChange: this.onSelectChange,
       columnTitle: 'Favorite',
     };
     return (
-      <div className="teamslist-container container">
+      <div className={this.mainClass}>
         <Search
           placeholder="Search team"
           onSearch={this.onSearch}
@@ -93,10 +112,22 @@ export default class TeamList extends react.Component {
             };
           }}
           rowSelection={rowSelection}
-          columns={columns}
-          dataSource={this.state.teams}
+          columns={this.columns}
+          dataSource={this.teamsDate}
         />
       </div>
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  data: state,
+});
+
+const mapDispatchToProps = {
+  updateSelected,
+  removeSelected,
+  addSelected,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(_TeamList);

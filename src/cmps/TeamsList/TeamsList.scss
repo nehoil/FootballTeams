@@ -7,6 +7,8 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  transition: .1s;
+  opacity: 0;
   img {
     width: 80px;
   }
@@ -19,10 +21,16 @@
      width: 100%;
   }
   .ant-table-cell {
+    transition: .5s;
+    opacity: 1;
     @media (max-width: 476px) {
       img {
         width: 20px;
       }
     }
   }
+}
+.show {
+  visibility: visible;
+  opacity: 1;
 }

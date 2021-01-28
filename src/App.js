@@ -3,13 +3,20 @@ import './App.scss';
 import Navbar from './cmps/NavBar';
 import Teams from './pages/Teams';
 import Home from './pages/Home';
+import { connect } from 'react-redux';
+import { loadData} from './store/actions/teamsAction';
+
 import {
   HashRouter as Router,
   Route,
   Switch
 } from 'react-router-dom';
+import { useEffect } from 'react';
 
-function App() {
+function _App({loadData}) {
+  useEffect(() => {
+    loadData()
+  })
   return (
     
     <div className="App">
@@ -25,4 +32,12 @@ function App() {
   );
 }
 
-export default App;
+
+
+const mapDispatchToProps = {
+  loadData
+};
+
+export default connect(null, mapDispatchToProps)(_App);
+
+

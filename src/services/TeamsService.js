@@ -7,16 +7,12 @@ const TEAMS_STORAGE_KEY = 'TEAMS_DB'
 
 const gTeams = storageService.load(TEAMS_STORAGE_KEY) || _loadTeams()
 
-
 export const TeamService = {
     getTeams,
     updateSelected
-    // getTeamById,
-    // save,
-    // remove
 }
 
-function getTeams(){
+async function getTeams(term){
     return gTeams
 }
 
@@ -25,6 +21,7 @@ async function updateSelected(selected) {
     currTeams.selected = selected
     storageService.store(TEAMS_STORAGE_KEY, currTeams)
 }
+
 
 async function _loadTeams() {
     const options = {
@@ -36,12 +33,16 @@ async function _loadTeams() {
     };
     try {
         var res = await axios.request(options)
+        const teams = res.data.teams.reduce((acc, team, idx) => {
+            team.key = idx;
+            acc.push(team);
+            return acc;
+          }, []);
         const data = {
-            teams: res.data.teams,
+            teams,
             selected: []
         }
         storageService.store(TEAMS_STORAGE_KEY, data)
-        console.log('storageService', storageService.load(TEAMS_STORAGE_KEY));
         return data
     } catch (e) {
         console.log('error while getting data from server: ', e);
